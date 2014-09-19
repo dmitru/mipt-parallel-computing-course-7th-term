@@ -4,12 +4,11 @@
 using namespace std;
 
 #include "utils.h"
+#include "computation.h"
 
 Args parseArgumentsOrShowUsageAndDie(int argc, char **argv);
 
 void loadInitialData(Data &data);
-
-void computeResult(Data &data);
 
 void writeResultToFile(Data &data, const char *fileName);
 
@@ -47,11 +46,6 @@ Args parseArgumentsOrShowUsageAndDie(int argc, char **argv)
 }
 
 void loadInitialData(Data &data)
-{
-	// TODO
-}
-
-void computeResult(Data &data)
 {
 	// TODO
 }

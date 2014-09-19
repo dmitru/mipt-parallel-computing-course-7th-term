@@ -4,6 +4,11 @@
 * Link: http://www.dborodytechblog.com/c-macro-measuring-time-profiling/
 */
 
+#ifndef UTILS_H_
+#define UTILS_H_
+
+#include <cstdlib>
+
 #define MEASURE_TIME_MS( timerVar, ...) \
   do { \
     struct timeval timerVar##_start, timerVar##_end; \
@@ -55,3 +60,5 @@ private:
   double *current;
   size_t size;
 };
+
+#endif // UTILS_H_
