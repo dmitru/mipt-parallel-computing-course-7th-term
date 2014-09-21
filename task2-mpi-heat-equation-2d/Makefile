@@ -13,3 +13,4 @@ clean:
 	rm -f heat_serial
 	rm -f heat_mpi 
 	rm -f hello
+	rm -rf ./output

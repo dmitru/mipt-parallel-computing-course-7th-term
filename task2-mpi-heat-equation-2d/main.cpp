@@ -55,18 +55,19 @@ Args parseArgumentsOrShowUsageAndDie(int argc, char **argv)
 void loadInitialData(Data &data, double alpha, double beta)
 {
 	double *prevBuffer = data.getCurrentBuffer();
+	double *nextBuffer = data.getNextBuffer();
 	size_t N = data.getSize();
 	for (int i = 0; i < N; i++) { 
 		for (int j = 0; j < N; j++) { 
 			double x = GET_X(i, N);
 			double y = GET_Y(j, N);
-			double f = exp(-1.0 / (alpha * alpha) * (x * x - 2 * beta * x * y + y * y) );
+			double f = exp(-1.0 / (alpha * alpha) * (x * x - 2 * beta * x * y + y * y));
 
 			prevBuffer[GET_INDEX(i, j, N)] = f;
+			nextBuffer[GET_INDEX(i, j, N)] = f;
 		}
 	}
 
-	double *nextBuffer = data.getNextBuffer();
 	for (int i = 0; i < N; i++) {
 		// u(x, 0, 0)
 		prevBuffer[GET_INDEX(i, 0, N)] = 0.0;
@@ -94,8 +95,9 @@ void writeResultToFile(Data &data, const char *fileName)
 	size_t N = data.getSize();
 	for (int i = 0; i < N; i++) { 
 		for (int j = 0; j < N; j++) { 
-			fprintf(fout, "%8.3f", buffer[GET_INDEX(i, j, N)]);
+			fprintf(fout, "%8.3f ", buffer[GET_INDEX(i, j, N)]);
 		}
+		fprintf(fout, "\n");
 	}
 
 	fclose(fout);
