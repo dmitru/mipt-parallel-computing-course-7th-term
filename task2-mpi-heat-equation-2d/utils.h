@@ -8,6 +8,7 @@
 #define UTILS_H_
 
 #include <cstdlib>
+#include <sys/time.h>
 
 #define MEASURE_TIME_MS( timerVar, ...) \
   do { \
@@ -24,7 +25,9 @@
                + timerVar##_useconds / 1000.0); \
   } while (0) 
 
-#define DATA_INDEX(N, i, j, k) ( ((k) * (N) * (N)) + j * ()
+#define GET_X(i, N) (1.0 / N * i)
+#define GET_Y(i, N) (1.0 / N * i)
+#define GET_INDEX(i, j, N) ( ((i) * (N)) + (j) )
 
 struct Args {
   size_t N;
@@ -40,14 +43,30 @@ public:
   : a(new double[size * size]), 
     b(new double[size * size]),
     current(a),
+    next(b),
     size(size) { }
 
+  ~Data() {
+    delete a;
+    delete b;
+  }
+
   void flip() {
-    current = (current == a)? b : a;
+    if (current == a) {
+      current = b;
+      next = a;
+    } else {
+      current = a;
+      next = b;
+    }
   }
 
   double *getCurrentBuffer() {
     return current;
+  }
+
+  double *getNextBuffer() {
+    return next;
   }
 
   size_t getSize() {
@@ -58,6 +77,7 @@ private:
   double *a;
   double *b;
   double *current;
+  double *next;
   size_t size;
 };
 
