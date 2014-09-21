@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
+#include <mpi.h>
 using namespace std;
 
 #include "utils.h"
@@ -15,8 +16,9 @@ void writeResultToFile(Data &data, const char *fileName);
 
 int main(int argc, char **argv)
 {
-	Args args = parseArgumentsOrShowUsageAndDie(argc, argv);
+	MPI_Init(&argc, &argv);
 
+	Args args = parseArgumentsOrShowUsageAndDie(argc, argv);
 	Data data(args.N);
 	loadInitialData(data, args.alpha, args.beta);	
 
@@ -25,9 +27,15 @@ int main(int argc, char **argv)
 		computeResult(data, args.T, args.alpha, args.beta);
 	);
 
-	cout << fixed << timeMsMeasured << endl;
+	int myRank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 
-	writeResultToFile(data, args.fileOut);
+    if (myRank == 0) {
+    	cout << fixed << timeMsMeasured << endl;
+    	writeResultToFile(data, args.fileOut);
+	}
+
+	MPI_Finalize();
 }
 
 Args parseArgumentsOrShowUsageAndDie(int argc, char **argv)
