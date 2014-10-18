@@ -1,0 +1,6 @@
+Parallelize loops using
+1, 4 - pthread
+2, 5 - MPI
+3, 6 - OpenMP
+
+Plot speedup(number of processes/threads) for each case
