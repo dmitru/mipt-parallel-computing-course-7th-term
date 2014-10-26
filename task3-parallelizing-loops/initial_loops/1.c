@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "utils.h"
+
 #define ISIZE 1000
 #define JSIZE 1000
 
@@ -17,12 +19,20 @@ int main(int argc, char **argv) {
     }
   }
 
+  long timeElapsed = 0.0;
+
+  MEASURE_TIME_MS(timeElapsed, 
+    {
   // Parallelize
-  for (i = 0; i < ISIZE; ++i) {
-    for (j = 0; j < JSIZE; ++j) {
-      a[i][j] = sin(0.00001 * a[i][j]);
+     for (i = 0; i < ISIZE; ++i) {
+        for (j = 0; j < JSIZE; ++j) {
+            a[i][j] = sin(0.00001 * a[i][j]);
+         }
+     }
     }
-  }
+  );
+
+  printf("%.6f\n", timeElapsed);
 
   ff = fopen("1.out", "w");
   for (i = 0; i < ISIZE; ++i) {

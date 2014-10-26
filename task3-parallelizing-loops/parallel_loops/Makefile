@@ -3,7 +3,7 @@ all: first
 	@echo "Done!"
 
 first:
-	gcc -o build/parallel_1 ./parallel_1.c -pthread
+	gcc -o build/parallel_1 ./parallel_1.c -pthread -lm
 
 clean:
 	rm -f ./build/*
