@@ -21,7 +21,7 @@ i=0
 while [ "$i" -lt "$n" ]; do
     echo "Run ${i}th iteration..." 1>&2
     res_serial=`$PROG_SERIAL`
-    res_parallel=`$PROG_PARALLEL`
+    res_parallel=`$PROG_PARALLEL $2`
     echo $res_serial $res_parallel
     i=$((i+1))
 done
