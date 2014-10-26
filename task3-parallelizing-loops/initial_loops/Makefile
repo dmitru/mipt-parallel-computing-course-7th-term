@@ -1,9 +1,8 @@
-all:
-	gcc -o serial_1 ./1.c
-	gcc -o serial_2 ./2.c
-	gcc -o serial_3 ./3.c
-	gcc -o serial_4 ./4.c
-	gcc -o serial_5 ./5.c
+all: serial_1
+	
+
+serial_1:
+	gcc -o ./build/serial_1 ./1.c
 
 clean:
-	rm ./serial_*
+	rm -f ./build/*
