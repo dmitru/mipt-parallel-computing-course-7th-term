@@ -6,7 +6,8 @@ NUM_OF_THREADS_TO_TRY="1 2 3 4 6 8 12 16"
 SCRIPTS_DIR=./scripts
 
 if [ "$#" -lt 3 ]; then
-    echo "Usage: $0 <>"
+    echo "Usage: $0 <serial program> <parallel program> <result filename> [ <number of runs for each test case> ]"
+    exit 1
 fi
 
 if [ "$4" != "" ]; then
