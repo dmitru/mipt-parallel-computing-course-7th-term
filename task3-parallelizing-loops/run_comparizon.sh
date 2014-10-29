@@ -1,7 +1,7 @@
-#!/usr/bin/zsh
 
 n=3
 NUM_OF_THREADS_TO_TRY="1 2 3 4 6 8 12 16"
+PYTHON=python2
 
 SCRIPTS_DIR=./scripts
 
@@ -28,7 +28,7 @@ done
 echo "Done"
 
 # Avarage runtimes of the serial program
-SERIAL_AVERAGE_TIME=`cat $SERIAL_FILENAME | python $SCRIPTS_DIR/average.py`
+SERIAL_AVERAGE_TIME=`cat $SERIAL_FILENAME | $PYTHON $SCRIPTS_DIR/average.py`
 
 PARALLEL_RESULTS_ALL=./results/$3_speedups_parallel
 echo "" > $PARALLEL_RESULTS_ALL
@@ -49,9 +49,10 @@ do
         res_parallel=`$PROG_PARALLEL $num_of_threads`
         echo $res_parallel >> $PARALLEL_FILENAME
         i=$((i+1))
+        echo "Done"
     done
 
-    postprocess_output=`python $SCRIPTS_DIR/postprocess.py $SERIAL_AVERAGE_TIME $PARALLEL_FILENAME`
+    postprocess_output=`$PYTHON $SCRIPTS_DIR/postprocess.py $SERIAL_AVERAGE_TIME $PARALLEL_FILENAME`
     echo $num_of_threads $postprocess_output >> $PARALLEL_RESULTS_ALL
 done
 
