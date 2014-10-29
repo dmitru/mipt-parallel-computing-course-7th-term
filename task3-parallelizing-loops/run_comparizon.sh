@@ -1,6 +1,6 @@
 
 n=3
-NUM_OF_THREADS_TO_TRY="1 2 3 4 6 8 12 16"
+NUM_OF_THREADS_TO_TRY="1 2 3 4 6 8 12 16 20 32"
 PYTHON=python2
 
 SCRIPTS_DIR=./scripts
@@ -21,7 +21,7 @@ echo "" > $SERIAL_FILENAME
 i=0
 while [ "$i" -lt "$n" ]; do
     echo "Run ${i}th iteration..." 1>&2
-    res_serial=`$PROG_SERIAL`
+    res_serial=`$PROG_SERIAL 1`
     echo $res_serial >> $SERIAL_FILENAME
     i=$((i+1))
 done

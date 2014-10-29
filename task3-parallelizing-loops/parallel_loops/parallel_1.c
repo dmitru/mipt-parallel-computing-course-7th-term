@@ -17,10 +17,12 @@ typedef struct Task {
 
 void* routine(void *arg) {
   Task *pTask = (Task*) arg;
-  for (int i = pTask->firstIndex; i <= pTask->lastIndex; ++i) {
+  int lastIndex = pTask->lastIndex;
+  double *array = pTask->a;
+  for (int i = pTask->firstIndex; i <= lastIndex; ++i) {
     for (int j = 0; j < JSIZE; ++j) {
         for (int k = 0; k < 50; k++)
-          pTask->a[i * JSIZE + j] = sin(0.00001 * k * pTask->a[i * JSIZE + j]);
+          array[i * JSIZE + j] = sin(0.00001 * k * array[i * JSIZE + j]);
     }
   }
 
