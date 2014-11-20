@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
 
   printf("%.6lf\n", timeElapsed);
 
-  ff = fopen("1_parallel.out", "w");
+  ff = fopen("4_parallel.out", "w");
   for (int i = 0; i < ISIZE; ++i) {
     for (int j = 0; j < JSIZE; ++j) {
       fprintf(ff, "%f ", a[i][j]);

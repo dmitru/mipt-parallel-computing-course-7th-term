@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     {
   // Parallelize
      for (int i = 0; i < ISIZE; ++i) {
-        for (int j = 0; j < JSIZE; ++j) {
+        for (int j = 0; j < JSIZE - 2; ++j) {
             for (int k = 0; k < KSIZE; k++)
               a[i][j] = sin(0.00001 * a[i][j + 2]);
          }
@@ -36,7 +36,7 @@ int main(int argc, char **argv) {
 
   printf("%.6lf\n", timeElapsed);
 
-  ff = fopen("1.out", "w");
+  ff = fopen("4.out", "w");
   for (i = 0; i < ISIZE; ++i) {
     for (j = 0; j < JSIZE; ++j) {
       fprintf(ff, "%f ", a[i][j]);
