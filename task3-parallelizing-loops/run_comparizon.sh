@@ -1,7 +1,8 @@
 
 n=3
-NUM_OF_THREADS_TO_TRY="1 2 3 4 6 8 12 16 20 32"
-PYTHON=python2
+NUM_OF_THREADS_TO_TRY="1 2 3 4 6 8 12 16 20"
+NUM_OF_THREADS_TO_TRY="1 2 3"
+PYTHON=python2.7
 
 SCRIPTS_DIR=./scripts
 
@@ -16,12 +17,13 @@ fi
 
 echo "Run serial program..."
 PROG_SERIAL=$1
+PROG_PARALLEL=$2
 SERIAL_FILENAME=./results/$3_times_serial
 echo "" > $SERIAL_FILENAME
 i=0
 while [ "$i" -lt "$n" ]; do
     echo "Run ${i}th iteration..." 1>&2
-    res_serial=`$PROG_SERIAL 1`
+    res_serial=`$PROG_PARALLEL 1`
     echo $res_serial >> $SERIAL_FILENAME
     i=$((i+1))
 done
@@ -37,7 +39,6 @@ for num_of_threads in $NUM_OF_THREADS_TO_TRY
 do
     echo "Run parallel programs with $num_of_threads threads (processes)"
 
-    PROG_PARALLEL=$2
     PARALLEL_FILENAME=./results/$3_times_parallel_${num_of_threads}_threads
 
     echo "Will run programs $n times" 1>&2

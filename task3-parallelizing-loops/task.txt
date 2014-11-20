@@ -3,4 +3,4 @@ Parallelize loops using
 2, 5 - MPI
 3, 6 - OpenMP
 
-Plot speedup(number of processes/threads) for each case
+Plot speedup (number of processes/threads) for each case

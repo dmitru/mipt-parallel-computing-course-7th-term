@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
   // Parallelize
      for (int i = 0; i < ISIZE; ++i) {
         for (int j = 0; j < JSIZE; ++j) {
-            for (int k = 0; k < 50; k++)
+            for (int k = 0; k < 100; k++)
               a[i][j] = sin(0.00001 * a[i][j]);
          }
      }

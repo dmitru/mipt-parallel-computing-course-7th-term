@@ -8,6 +8,7 @@
 
 #define ISIZE 1000
 #define JSIZE 1000
+#define KSIZE 100
 
 typedef struct Task {
   int firstIndex;
@@ -20,9 +21,9 @@ void* routine(void *arg) {
   int lastIndex = pTask->lastIndex;
   double *array = pTask->a;
   for (int i = pTask->firstIndex; i <= lastIndex; ++i) {
-    for (int j = 0; j < JSIZE; ++j) {
-        for (int k = 0; k < 100; k++)
-          array[i * JSIZE + j] = sin(0.00001 * k * array[i * JSIZE + j]);
+    for (int j = 0; j < JSIZE - 2; ++j) {
+        for (int k = 0; k < KSIZE; k++)
+          array[i * JSIZE + j] = sin(0.00001 * k * array[i * JSIZE + j + 2]);
     }
   }
 
@@ -36,6 +37,7 @@ int main(int argc, char **argv) {
   int threadNum = 1;
   if (argc > 1)
     threadNum = atoi(argv[1]);
+
 
   // Initialization
   for (int i = 0; i < ISIZE; ++i) {
@@ -77,5 +79,5 @@ int main(int argc, char **argv) {
     fprintf(ff, "\n");
   }
   fclose(ff);
-  pthread_exit(NULL);
+  return 0;
 }
