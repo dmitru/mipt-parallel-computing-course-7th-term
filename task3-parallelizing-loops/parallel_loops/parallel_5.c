@@ -5,8 +5,8 @@
 
 #include "utils.h"
 
-#define ISIZE 3000
-#define JSIZE 3000
+#define ISIZE 1000
+#define JSIZE 1000
 #define KSIZE 100
 
 #define TAG_SEND_DATA 1
@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
   double dataSplitted[JSIZE][ISIZE];
   if (myRank == 0) {
     for (int j0 = 0; j0 < JSIZE; ++j0) {
-      for (int i = 0, j = j0; i < ISIZE; ++i, j = (j + JSIZE - 1) % JSIZE) {
+      for (int i = 0, j = j0; i < ISIZE; ++i, j = (j + JSIZE + 2) % JSIZE) {
         dataSplitted[j0][i] = a[i][j];
       }
     }
@@ -78,8 +78,8 @@ int main(int argc, char **argv) {
 
   // Compute partial results
   for (int j0 = segmentsStart[myRank]; j0 <= segmentsEnd[myRank]; ++j0) {
-    for (int i = 0, j = j0; i < ISIZE; ++i, j = (j + JSIZE - 1) % JSIZE) {
-      if ((j < JSIZE - 1) && (i > 0)) {
+    for (int i = 0, j = j0; i < ISIZE; ++i, j = (j + JSIZE + 2) % JSIZE) {
+      if ((j > 1) && (i > 0)) {
         for (int k = 0; k < KSIZE; ++k) {
           dataSplitted[j0][i] = sin(0.01 * dataSplitted[j0][i - 1]); 
         }
@@ -104,7 +104,7 @@ int main(int argc, char **argv) {
     // Put results back into matrix, output time and print results
   
     for (int j0 = 0; j0 < JSIZE; ++j0) {
-      for (int i = 0, j = j0; i < JSIZE; ++i, j = (j + JSIZE - 1) % JSIZE) {
+      for (int i = 0, j = j0; i < JSIZE; ++i, j = (j + JSIZE + 2) % JSIZE) {
         a[i][j] = dataSplitted[j0][i]; 
       }
     }
@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
     MEASURE_TIME_MS_END(timeElapsedMs);
     printf("%.6lf\n", timeElapsedMs);
 
-    FILE *ff = fopen("parallel_2.out", "w");
+    FILE *ff = fopen("parallel_5.out", "w");
     for (int i = 0; i < ISIZE; ++i) {
       for (int j = 0; j < JSIZE; ++j) {
         fprintf(ff, "%f ", a[i][j]);
