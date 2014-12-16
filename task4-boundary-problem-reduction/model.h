@@ -1,7 +1,16 @@
 
 #pragma once
 
+#include "includes.h"
 #include <math.h>
+
+#define g_array_get(a, i) g_array_index((a), double, (i))
+#define g_array_set(a, i, v) {\
+    double t = (v);\
+    g_array_index((a), double, (i)) = t;\
+}
+#define g_array_ref(a, i) g_array_index((a), double, (i))
+
 
 /**
  * Describes linear system used for solution of boundary-value 

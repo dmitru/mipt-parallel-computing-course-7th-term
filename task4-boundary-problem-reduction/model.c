@@ -2,13 +2,6 @@
 #include "includes.h"
 #include "model.h"
 
-#define g_array_get(a, i) g_array_index((a), double, (i))
-#define g_array_set(a, i, v) {\
-    double t = (v);\
-    g_array_index((a), double, (i)) = t;\
-}
-#define g_array_ref(a, i) g_array_index((a), double, (i))
-
 model_s* model_create_with_params(model_create_params_s params)
 {
 #ifdef DEBUG
