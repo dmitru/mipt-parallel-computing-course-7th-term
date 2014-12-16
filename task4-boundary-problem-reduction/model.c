@@ -7,6 +7,7 @@
     double t = (v);\
     g_array_index((a), double, (i)) = t;\
 }
+#define g_array_ref(a, i) g_array_index((a), double, (i))
 
 model_s* model_create_with_params(model_create_params_s params)
 {
@@ -26,18 +27,20 @@ model_s* model_create_with_params(model_create_params_s params)
     model->f = g_array_new(FALSE, FALSE, sizeof(double));
     g_array_set_size(model->f, n + 1);
    
-    g_array_set(model->a, 0, 1.0);
-    g_array_set(model->a, n, 1.0);
+    g_array_ref(model->a, 0) = 1.0;
+    g_array_ref(model->a, n) = 1.0;
 
-    g_array_set(model->f, 0, params.a);
-    g_array_set(model->f, n, params.b);
+    g_array_ref(model->f, 0) = params.a;
+    g_array_ref(model->f, n) = params.b;
 
     double interval = params.end - params.start;
     double h = interval / n;
+
+#pragma omp parallel for
     for (int i = 1; i < n; ++i) {
-        g_array_set(model->a, i, -2.0);
-        g_array_set(model->b, i, 1.0);
-        g_array_set(model->c, i, 1.0);
+        g_array_ref(model->a, i) = -2.0;
+        g_array_ref(model->b, i) = 1.0;
+        g_array_ref(model->c, i) = 1.0;
 
         double x_prev = params.start + h * (i - 1);
         double x_curr = params.start + h * i;
@@ -47,7 +50,7 @@ model_s* model_create_with_params(model_create_params_s params)
         double f_curr = (*params.f)(x_curr);
         double f_next = (*params.f)(x_next);
         
-        g_array_set(model->f, i, (h*h / 12.0 * (f_prev + f_next + 10.0 * f_curr)));
+        g_array_ref(model->f, i) = h*h / 12.0 * (f_prev + f_next + 10.0 * f_curr);
     }
 
 #ifdef DEBUG
