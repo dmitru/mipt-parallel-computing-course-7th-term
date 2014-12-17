@@ -13,10 +13,13 @@ GArray* solve_model(model_s *model, int num_processes)
     GArray *x = g_array_new(FALSE, TRUE, sizeof(double));
     g_array_set_size(x, n + 1);
 
-    const int DEPTH = 10;
+    const int depth = ceil(log2(n));
 
-    GArray *a_buffers[10], *b_buffers[10], *c_buffers[10], *f_buffers[10];
-    for (int level = 0; level < DEPTH; ++level) {
+    GArray *a_buffers[depth],
+           *b_buffers[depth], 
+           *c_buffers[depth],
+           *f_buffers[depth];
+    for (int level = 0; level < depth; ++level) {
         a_buffers[level] = g_array_new(FALSE, TRUE, sizeof(double));
         g_array_set_size(a_buffers[level], n + 1);
         b_buffers[level] = g_array_new(FALSE, TRUE, sizeof(double));
@@ -60,7 +63,7 @@ GArray* solve_model(model_s *model, int num_processes)
             fprintf(stderr, "forward step %d, stride is %d, number of unknowns %d\n", level, stride, number_of_unknowns);
         #endif
 
-        // TODO: stride that should be parallelized
+        // TODO: for-loop that should be parallelized
         for (int i = stride * 2; i < n; i += stride * 2) {
             #ifdef DEBUG
                 fprintf(stderr, "\ti = %d\n", i);
@@ -100,7 +103,7 @@ GArray* solve_model(model_s *model, int num_processes)
             fprintf(stderr, "backward step %d, stride %d\n", level, stride);
         #endif
 
-        // Parallelize this step
+        // TODO: Parallelize this step
         for (int i = stride; i < n; i += 2 * stride) {
             #ifdef DEBUG
                 fprintf(stderr, "\ti = %d\n", i);
@@ -114,6 +117,12 @@ GArray* solve_model(model_s *model, int num_processes)
     }
 
     // TODO: free buffers
+    for (int i = 0; i < depth; ++i) {
+        g_array_free(a_buffers[i], TRUE);
+        g_array_free(b_buffers[i], TRUE);
+        g_array_free(c_buffers[i], TRUE);
+        g_array_free(f_buffers[i], TRUE);
+    }
 
     return x;
 }
