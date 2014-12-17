@@ -16,27 +16,45 @@ void print_results(GArray *y, model_create_params_s params)
 
 double f_exp(double x) 
 {
-    return exp(x);
+    return exp(-x);
 }
 
 int main(int argc, char **argv) 
 {
     int num_processes = 1;
-    if (argc > 1) {
-        num_processes = atoi(argv[1]);
+    if (argc > 2) {
+        num_processes = atoi(argv[2]);
     }
 
+    int number_of_points = 1024;
+    if (argc > 1) {
+        number_of_points = atoi(argv[1]);
+    }
+
+    double b = 1.0;
+    if (argc > 3) {
+        b = atof(argv[3]);
+    }
+
+    omp_set_num_threads(num_processes);
+
     model_create_params_s model_params = {
-        .a = 0.0,
-        .b = 0.0,
+        .a = 1.0,
+        .b = b,
         .start = 0.0,
         .end = 1.0,
-        .n = 1024,
+        .n = number_of_points,
         .f = f_exp
     };
     model_s *model = model_create_with_params(model_params);
-    GArray *y = solve_model(model, num_processes);
 
+    double timeElapsedMs;
+    GArray *y = NULL;
+    MEASURE_TIME_MS(timeElapsedMs,
+        y = solve_model(model, num_processes);
+    );
+
+    fprintf(stderr, "%.6f\n", timeElapsedMs);
     print_results(y, model_params);
 
     g_array_free(y, TRUE);
