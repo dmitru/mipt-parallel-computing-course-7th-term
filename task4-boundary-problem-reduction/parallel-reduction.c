@@ -14,6 +14,11 @@ void print_results(GArray *y, model_create_params_s params)
     }
 }
 
+double f_exp(double x) 
+{
+    return exp(x);
+}
+
 int main(int argc, char **argv) 
 {
     int num_processes = 1;

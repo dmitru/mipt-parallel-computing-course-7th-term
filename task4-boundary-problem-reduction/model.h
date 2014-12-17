@@ -11,14 +11,27 @@
 }
 #define g_array_ref(a, i) g_array_index((a), double, (i))
 
+#ifdef DEBUG
+#define debug_print_array(a) {\
+    if (n < 100) {\
+        fprintf(stderr, #a":\n");\
+        for (int i = 0; i <= n; ++i) {\
+            fprintf(stderr, "%.6lf, ", g_array_get((a), i));\
+        }\
+        fprintf(stderr, "\n");\
+    }\
+}
+#else
+#define debug_print_array(a) 
+#endif
 
 /**
  * Describes linear system used for solution of boundary-value 
  * problem of the form:
  *   y'' = f(y),
  *   x in interval [start, end]
- *   y(start) = a
- *   y(end)   = b
+ *   y(start) = y_start,
+ *   y(end)   = y_end
  *
  * a, b, c - arrays of length (n + 1) that hold 
  * three diagonals of the system's matrix
@@ -29,6 +42,7 @@ typedef struct {
     GArray *a, *b, *c;
     GArray *f;
     size_t n;
+    double y_start, y_end;
 } model_s;
 
 typedef double (*model_function_p)(double);
@@ -51,8 +65,6 @@ typedef struct {
 
 void model_params_print(model_create_params_s params);
 
-double f_exp(double y);
-
 /**
  * Constructs model given model params
  */
@@ -65,7 +77,7 @@ model_s* model_create_with_params(model_create_params_s params);
             .start = 0.0, \
             .end = 1.0, \
             .n = 1024, \
-            .f = f_exp, \
+            .f = NULL, \
             __VA_ARGS__\
         })
 

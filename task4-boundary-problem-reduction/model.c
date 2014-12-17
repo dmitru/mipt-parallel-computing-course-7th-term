@@ -19,6 +19,9 @@ model_s* model_create_with_params(model_create_params_s params)
     g_array_set_size(model->c, n + 1);
     model->f = g_array_new(FALSE, FALSE, sizeof(double));
     g_array_set_size(model->f, n + 1);
+
+    model->y_start = params.a;
+    model->y_end = params.b;
    
     g_array_ref(model->a, 0) = 1.0;
     g_array_ref(model->a, n) = 1.0;
@@ -46,16 +49,7 @@ model_s* model_create_with_params(model_create_params_s params)
         g_array_ref(model->f, i) = h*h / 12.0 * (f_prev + f_next + 10.0 * f_curr);
     }
 
-#ifdef DEBUG
-    if (n < 100) {
-        fprintf(stderr, "f:\n");
-        for (int i = 0; i <= n; ++i) {
-            fprintf(stderr, "%.6lf, ", g_array_get(model->f, i));
-        }
-        fprintf(stderr, "\n");
-    }
-#endif
-
+    debug_print_array(model->f);
     return model;
 }
 
@@ -77,8 +71,4 @@ void model_params_print(model_create_params_s params)
 }
 
 
-double f_exp(double y)
-{
-    return exp(-y);
-}
 
