@@ -12,59 +12,52 @@ GArray* solve_model(model_s *model, int num_processes)
 
     GArray *x = g_array_new(FALSE, TRUE, sizeof(double));
     g_array_set_size(x, n + 1);
-    
-    GArray *a_buffers[2], *b_buffers[2], *c_buffers[2], *f_buffers[2];
-    for (int i = 0; i < 2; ++i) {
-        a_buffers[i] = g_array_new(FALSE, TRUE, sizeof(double));
-        g_array_set_size(a_buffers[i], n + 1);
-        b_buffers[i] = g_array_new(FALSE, TRUE, sizeof(double));
-        g_array_set_size(b_buffers[i], n + 1);
-        c_buffers[i] = g_array_new(FALSE, TRUE, sizeof(double));
-        g_array_set_size(c_buffers[i], n + 1);
-        f_buffers[i] = g_array_new(FALSE, TRUE, sizeof(double));
-        g_array_set_size(f_buffers[i], n + 1);
+
+    const int DEPTH = 10;
+
+    GArray *a_buffers[10], *b_buffers[10], *c_buffers[10], *f_buffers[10];
+    for (int level = 0; level < DEPTH; ++level) {
+        a_buffers[level] = g_array_new(FALSE, TRUE, sizeof(double));
+        g_array_set_size(a_buffers[level], n + 1);
+        b_buffers[level] = g_array_new(FALSE, TRUE, sizeof(double));
+        g_array_set_size(b_buffers[level], n + 1);
+        c_buffers[level] = g_array_new(FALSE, TRUE, sizeof(double));
+        g_array_set_size(c_buffers[level], n + 1);
+        f_buffers[level] = g_array_new(FALSE, TRUE, sizeof(double));
+        g_array_set_size(f_buffers[level], n + 1);
     }
 
-    GArray *a = a_buffers[0],
-           *b = b_buffers[0],
-           *c = c_buffers[0],
-           *f = f_buffers[0];
-
-    GArray *a_next = a_buffers[1],
-           *b_next = b_buffers[1],
-           *c_next = c_buffers[1],
-           *f_next = f_buffers[1];
+    GArray **a = a_buffers,
+           **b = b_buffers,
+           **c = c_buffers,
+           **f = f_buffers;
 
     // 1. Copy the arrays a, b, c, f from model to local arrays a, b, c, f
     for (int i = 0; i <= n; i++) {
-        g_array_ref(a, i) = g_array_ref(model->a, i);
-        g_array_ref(b, i) = g_array_ref(model->b, i);
-        g_array_ref(c, i) = g_array_ref(model->c, i);
-        g_array_ref(f, i) = g_array_ref(model->f, i);
-        g_array_ref(a_next, i) = g_array_ref(model->a, i);
-        g_array_ref(b_next, i) = g_array_ref(model->b, i);
-        g_array_ref(c_next, i) = g_array_ref(model->c, i);
-        g_array_ref(f_next, i) = g_array_ref(model->f, i);
+        g_array_ref(*a, i) = g_array_ref(model->a, i);
+        g_array_ref(*b, i) = g_array_ref(model->b, i);
+        g_array_ref(*c, i) = g_array_ref(model->c, i);
+        g_array_ref(*f, i) = g_array_ref(model->f, i);
     }
 
     // 2. Set boundary values for the solution
     ref(x, 0) = model->y_start;
     ref(x, n) = model->y_end;
     
-    debug_print_array(a);
-    debug_print_array(b);
-    debug_print_array(c);
-    debug_print_array(f);
+    debug_print_array(*a);
+    debug_print_array(*b);
+    debug_print_array(*c);
+    debug_print_array(*f);
 
 
     // 3. Run forward steps of the algorithm
     int number_of_unknowns = n - 1;
-    int level = 1;
+    int level = 0;
     int stride = 1;
     while (number_of_unknowns > 1) {
 
         #ifdef DEBUG
-            fprintf(stderr, "forward step %d, stride is %d, number of unknowns %d\n", level, stride * 2, number_of_unknowns);
+            fprintf(stderr, "forward step %d, stride is %d, number of unknowns %d\n", level, stride, number_of_unknowns);
         #endif
 
         // TODO: stride that should be parallelized
@@ -72,39 +65,33 @@ GArray* solve_model(model_s *model, int num_processes)
             #ifdef DEBUG
                 fprintf(stderr, "\ti = %d\n", i);
             #endif
-            double alpha = -ref(a, i) / ref(c, i - stride);
-            double beta =  -ref(b, i) / ref(c, i + stride);
+            double alpha = -ref(*b, i) / ref(*a, i - stride);
+            double beta =  -ref(*c, i) / ref(*a, i + stride);
 
-            double new_a = alpha * ref(a, i - stride);
-            double new_b =  beta * ref(b, i + stride);
-            double new_c = alpha * ref(b, i - stride) + ref(c, i) + beta * ref(a, i + stride);
-            double new_f = alpha * ref(f, i - stride) + ref(f, i) + beta * ref(f, i + stride);
+            fprintf(stderr, "alpha = %.6lf, beta = %.6lf\n", alpha, beta);
 
-            ref(a_next, i) = new_a;
-            ref(b_next, i) = new_b;
-            ref(c_next, i) = new_c;
-            ref(f_next, i) = new_f;
+            double new_b = alpha * ref(*b, i - stride);
+            double new_c =  beta * ref(*c, i + stride);
+            double new_a = alpha * ref(*c, i - stride) + ref(*a, i) + beta * ref(*b, i + stride);
+            double new_f = alpha * ref(*f, i - stride) + ref(*f, i) + beta * ref(*f, i + stride);
+
+            ref(*(a + 1), i) = new_a;
+            ref(*(b + 1), i) = new_b;
+            ref(*(c + 1), i) = new_c;
+            ref(*(f + 1), i) = new_f;
         }
 
         stride *= 2;
         level++;
         number_of_unknowns = (number_of_unknowns + 1) / 2 - 1;
-
-        swap(a, a_next);
-        swap(b, b_next);
-        swap(c, c_next);
-        swap(f, f_next);
+        
+        a++, b++, c++, f++;
+        
+        debug_print_array(*a);
+        debug_print_array(*b);
+        debug_print_array(*c);
+        debug_print_array(*f);
     }
-
-    debug_print_array(a);
-    debug_print_array(b);
-    debug_print_array(c);
-    debug_print_array(f);
-
-    //swap(a, a_next);
-    //swap(b, b_next);
-    //swap(c, c_next);
-    //swap(f, f_next);
 
     // 4. Run backward steps of the algorithm
     level--;
@@ -118,11 +105,12 @@ GArray* solve_model(model_s *model, int num_processes)
             #ifdef DEBUG
                 fprintf(stderr, "\ti = %d\n", i);
             #endif
-            double new_x = (ref(f, i) - ref(a, i) * ref(x, i - stride) - ref(b, i) * ref(x, i + stride)) / ref(c, i);
+            double new_x = (ref(*f, i) - ref(*b, i) * ref(x, i - stride) - ref(*c, i) * ref(x, i + stride)) / ref(*a, i);
             ref(x, i) = new_x;
         }
         stride /= 2;
         level--;
+        a--, b--, c--, f--;
     }
 
     // TODO: free buffers

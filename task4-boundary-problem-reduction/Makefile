@@ -3,7 +3,7 @@ EXECUTABLE=reduction
 
 CC= gcc
 LDFLAGS=`pkg-config --libs glib-2.0` -lm
-CFLAGS=-std=c11 `pkg-config --cflags glib-2.0` -O3 -g -Wall -DDEBUG -fopenmp 
+CFLAGS=-std=c11 `pkg-config --cflags glib-2.0` -O0 -g -Wall -DDEBUG -fopenmp 
 
 SOURCES=parallel-reduction.c model.c solver.c
 OBJECTS=$(SOURCES:.cpp=.o)

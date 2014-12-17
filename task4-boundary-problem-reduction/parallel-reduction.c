@@ -27,11 +27,11 @@ int main(int argc, char **argv)
     }
 
     model_create_params_s model_params = {
-        .a = 1.0,
-        .b = 1.0,
+        .a = 0.0,
+        .b = 0.0,
         .start = 0.0,
         .end = 1.0,
-        .n = 8,
+        .n = 1024,
         .f = f_exp
     };
     model_s *model = model_create_with_params(model_params);
